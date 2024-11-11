@@ -24,7 +24,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "../../user/remotecontrol/rc_func.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -60,7 +59,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern struct RC_Ctl_t RC_CtrlData;
+
 /* USER CODE END 0 */
 
 /**
