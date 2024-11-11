@@ -13,6 +13,8 @@ CAN_FilterTypeDef FilterConfig = {0, 0, 0, 0, CAN_FILTER_FIFO0, 14, CAN_FILTERMO
 CAN_RxHeaderTypeDef RxHeader;
 
 
+
+
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart == &huart3) {
         HAL_UARTEx_ReceiveToIdle_DMA(&huart3, buffer, sizeof(buffer));
@@ -25,11 +27,11 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, rx_data);
     motor_pitch.canRxMsgCallback(rx_data);
-
+    motor_yaw.canRxMsgCallback(rx_data);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    if (htim == &htim1) {
+    if (htim == &htim1 and RC_CtrlData.switch_.s2 != down) {
         MainLoop();
     }
 }

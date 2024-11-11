@@ -2,13 +2,13 @@
 // Created by CLC on 2024/11/11.
 //
 
+
 #ifndef MOTOR_DEF_H
 #define MOTOR_DEF_H
 #include <cstdint>
 
-//待改
 
-class Motor{
+class Motor {
 public:
     float ratio_; // 电机减速比
 
@@ -27,14 +27,16 @@ public:
     float max_;
     float min_;
 
+    void canRxMsgCallback(uint8_t rx_data[8]);
 
 };
 
 class M3508 : public Motor
 {
-    void Init()
+public:
+    M3508() : Motor()
     {
-        ratio_ = 3591.0/187;
+        ratio_ = 3591.0 / 187;
         angle_ = 0;
         delta_angle_ = 0;
         ecd_angle_ = 0;
@@ -43,14 +45,15 @@ class M3508 : public Motor
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
+        max_ = 180;
+        min_ = 0;
     }
-public:
-    void canRxMsgCallback(uint8_t rx_data[8]);
 };
 
 class M2006 : public Motor
 {
-    void Init()
+public:
+    M2006() : Motor()
     {
         ratio_ = -36;
         angle_ = 0;
@@ -61,16 +64,17 @@ class M2006 : public Motor
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
+        max_ = 180;
+        min_ = 0;
     }
-public:
-    void canRxMsgCallback(uint8_t rx_data[8]);
 };
 
 class M6020 : public Motor
 {
-    void Init()
+public:
+    M6020() : Motor()
     {
-        ratio_ = 3591.0/187;
+        ratio_ = 1;
         angle_ = 0;
         delta_angle_ = 0;
         ecd_angle_ = 0;
@@ -79,10 +83,9 @@ class M6020 : public Motor
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
+        max_ = 180;
+        min_ = 0;
     }
-public:
-    float torque_ = 0;
-    void canRxMsgCallback(uint8_t rx_data[8]);
 };
 
 extern M2006 motor_pitch;
