@@ -31,7 +31,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    if (htim == &htim1 and RC_CtrlData.switch_.s2 != down) {
+    if (htim == &htim1) {
         MainLoop();
     }
 }

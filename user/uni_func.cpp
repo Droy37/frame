@@ -4,6 +4,7 @@
 
 #include "uni_func.h"
 #include "can.h"
+#include "iwdg.h"
 #include "motor/motor_def.h"
 #include "motor/motor_pid.h"
 #include "remotecontrol/rc_def.h"
@@ -65,21 +66,24 @@ uint16_t Calculate(float ref, Motor motor){
 
 
 void MainLoop(){
+    HAL_IWDG_Refresh(&hiwdg);
     dataProcess(rc_data);
 
-    float pitch = linearMapping(RC_CtrlData.channel_.l_col, -1, 1, motor_pitch.min_, motor_pitch.max_);
-    uint16_t output = Calculate(pitch, motor_pitch);
-    tx_data[0] = uint8_t(output >> 8);
-    tx_data[1] = uint8_t(output & 0xFF);
-    TxHeader.StdId = 0x1FF;
-    TxHeader.ExtId = 0;
-    HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
+    if (RC_CtrlData.switch_.s2 != down){
+        float pitch = linearMapping(RC_CtrlData.channel_.l_col, -1, 1, motor_pitch.min_, motor_pitch.max_);
+        uint16_t output = Calculate(pitch, motor_pitch);
+        tx_data[0] = uint8_t(output >> 8);
+        tx_data[1] = uint8_t(output & 0xFF);
+        TxHeader.StdId = 0x1FF;
+        TxHeader.ExtId = 0;
+        HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
 
-    output = Calculate(RC_CtrlData.channel_.l_row, motor_yaw);
-    tx_data[0] = uint8_t(output >> 8);
-    tx_data[1] = uint8_t(output & 0xFF);
-    TxHeader.StdId = 0x1FF;
-    TxHeader.ExtId = 0;
-    HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
-
+        float yaw = linearMapping(RC_CtrlData.channel_.l_row, -1, 1, motor_yaw.min_, motor_yaw.max_);
+        output = Calculate(yaw, motor_yaw);
+        tx_data[0] = uint8_t(output >> 8);
+        tx_data[1] = uint8_t(output & 0xFF);
+        TxHeader.StdId = 0x1FF;
+        TxHeader.ExtId = 0;
+        HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
+    }
 }
