@@ -18,7 +18,7 @@ public:
     float err_,err_sum_, last_err_;
     float pout_, iout_, dout_;
 };
-extern PID pid_spd, pid_pos;
+extern PID pid_spd_pitch, pid_pos_pitch, pid_spd_yaw, pid_pos_yaw;
 
 
 #endif //MOTOR_PID_H

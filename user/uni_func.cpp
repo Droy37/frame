@@ -45,28 +45,41 @@ float linearMapping(float in, float in_min, float in_max, float out_min, float o
     return (in - in_min) / (in_max - in_min) * (out_max - out_min) + out_min;
 }
 
+float pitch_ff_ = 20.0f;
+uint16_t updateMotorPitch(float rc_input, Motor motor) {
+    pid_pos_pitch.ref_ = pid_pos_pitch.fdb_ + rc_input * 3.0f;
 
-uint16_t updateMotor(float rc_input, Motor motor) {
-    float dt = 0.001f;
-    if (rc_input != 0.0f) {
-        pid_pos.ref_ += rc_input * 5.0f * dt;
+    if (pid_pos_pitch.ref_ > motor.max_) pid_pos_pitch.ref_ = motor.max_;
+    if (pid_pos_pitch.ref_ < motor.min_) pid_pos_pitch.ref_ = motor.min_;
 
-        if (pid_pos.ref_ > motor.max_) pid_pos.ref_ = motor.max_;
-        if (pid_pos.ref_ < motor.min_) pid_pos.ref_ = motor.min_;
-    }
+    float err_ = pid_pos_pitch.ref_ - pid_pos_pitch.fdb_;
+    if (err_ > 180) pid_pos_pitch.fdb_ += 360;
+    else if (err_ < -180) pid_pos_pitch.fdb_ -= 360;
 
-    float err_ = pid_pos.ref_ - pid_pos.fdb_;
-    if (err_ > 180) {
-        pid_pos.fdb_ += 360;
-    } else if (err_ < -180) {
-        pid_pos.fdb_ -= 360;
-    }
-    float target_speed = pid_pos.calc(pid_pos.ref_, pid_pos.fdb_);
+    float target_speed = pid_pos_pitch.calc(pid_pos_pitch.ref_, pid_pos_pitch.fdb_);
 
-    pid_spd.ref_ = target_speed;
-    pid_spd.fdb_ = motor.rotate_speed_;
+    pid_spd_pitch.ref_ = target_speed;
+    pid_spd_pitch.fdb_ = motor.rotate_speed_;
 
-    return (uint16_t)pid_spd.calc(pid_spd.ref_, pid_spd.fdb_);
+    return uint16_t(pid_spd_pitch.calc(pid_spd_pitch.ref_, pid_spd_pitch.fdb_) + pitch_ff_);
+}
+
+uint16_t updateMotorYaw(float rc_input, Motor motor) {
+    pid_pos_yaw.ref_ = pid_pos_yaw.fdb_ + rc_input * 3.0f;
+
+    if (pid_pos_yaw.ref_ > motor.max_) pid_pos_yaw.ref_ = motor.max_;
+    if (pid_pos_yaw.ref_ < motor.min_) pid_pos_yaw.ref_ = motor.min_;
+
+    float err_ = pid_pos_yaw.ref_ - pid_pos_yaw.fdb_;
+    if (err_ > 180) pid_pos_yaw.fdb_ += 360;
+    else if (err_ < -180) pid_pos_yaw.fdb_ -= 360;
+
+    float target_speed = pid_pos_yaw.calc(pid_pos_yaw.ref_, pid_pos_yaw.fdb_);
+
+    pid_spd_yaw.ref_ = target_speed;
+    pid_spd_yaw.fdb_ = motor.rotate_speed_;
+
+    return uint16_t(pid_spd_yaw.calc(pid_spd_yaw.ref_, pid_spd_yaw.fdb_));
 }
 
 uint16_t output;
@@ -76,17 +89,14 @@ void MainLoop(){
     dataProcess(rc_data);
 
     if (RC_CtrlData.switch_.s2 != down){
-        //pitch
-        output = updateMotor(RC_CtrlData.channel_.l_col, motor_pitch);
+        output = updateMotorPitch(RC_CtrlData.channel_.l_col, motor_pitch);
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
         TxHeader.StdId = 0x1FF;
         TxHeader.ExtId = 0;
         HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
 
-
-        //yaw
-        output = updateMotor(RC_CtrlData.channel_.l_row, motor_yaw);
+        output = updateMotorYaw(RC_CtrlData.channel_.l_row, motor_yaw);
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
         TxHeader.StdId = 0x1FF;

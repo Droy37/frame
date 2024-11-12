@@ -39,5 +39,8 @@ float PID::calc(float ref, float fdb) {
 }
 
 
-PID pid_spd(1, 0, 0, 3000, 5000);
-PID pid_pos(1, 0, 0, 3000, 5000);
+PID pid_spd_pitch(1, 0, 0, 3000, 5000);
+PID pid_pos_pitch(1, 0, 0, 3000, 5000);
+
+PID pid_spd_yaw(1, 0, 0, 3000, 5000);
+PID pid_pos_yaw(1, 0, 0, 3000, 5000);

@@ -67,6 +67,7 @@ public:
         max_ = 180;
         min_ = 0;
     }
+    uint16_t updateMotor(float rc_input, Motor motor);
 };
 
 class M6020 : public Motor

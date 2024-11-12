@@ -12,9 +12,6 @@
 CAN_FilterTypeDef FilterConfig = {0, 0, 0, 0, CAN_FILTER_FIFO0, 14, CAN_FILTERMODE_IDMASK, CAN_FILTERSCALE_32BIT, ENABLE};
 CAN_RxHeaderTypeDef RxHeader;
 
-
-
-
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart == &huart3) {
         HAL_UARTEx_ReceiveToIdle_DMA(&huart3, buffer, sizeof(buffer));
