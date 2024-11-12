@@ -89,6 +89,9 @@ public:
     }
 };
 
+uint16_t updateMotorPitch(float rc_input, Motor motor);
+uint16_t updateMotorYaw(float rc_input, Motor motor);
+
 extern M2006 motor_pitch;
 extern M3508 motor_yaw;
 extern uint8_t rx_data[8];

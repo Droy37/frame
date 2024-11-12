@@ -3,6 +3,7 @@
 //
 
 #include "motor_def.h"
+#include "motor_pid.h"
 #include "../uni_func.h"
 
 void Motor::canRxMsgCallback(uint8_t* rx_data){
@@ -27,6 +28,43 @@ void Motor::canRxMsgCallback(uint8_t* rx_data){
 
     delta_angle_ = delta_ecd_angle_;
     angle_ += delta_angle_;
+}
+
+float pitch_ff_ = 20.0f;
+uint16_t updateMotorPitch(float rc_input, Motor motor) {
+    pid_pos_pitch.ref_ = pid_pos_pitch.fdb_ + rc_input * 3.0f;
+
+    if (pid_pos_pitch.ref_ > motor.max_) pid_pos_pitch.ref_ = motor.max_;
+    if (pid_pos_pitch.ref_ < motor.min_) pid_pos_pitch.ref_ = motor.min_;
+
+    float err_ = pid_pos_pitch.ref_ - pid_pos_pitch.fdb_;
+    if (err_ > 180) pid_pos_pitch.fdb_ += 360;
+    else if (err_ < -180) pid_pos_pitch.fdb_ -= 360;
+
+    float target_speed = pid_pos_pitch.calc(pid_pos_pitch.ref_, pid_pos_pitch.fdb_);
+
+    pid_spd_pitch.ref_ = target_speed;
+    pid_spd_pitch.fdb_ = motor.rotate_speed_;
+
+    return uint16_t(pid_spd_pitch.calc(pid_spd_pitch.ref_, pid_spd_pitch.fdb_) + pitch_ff_);
+}
+
+uint16_t updateMotorYaw(float rc_input, Motor motor) {
+    pid_pos_yaw.ref_ = pid_pos_yaw.fdb_ + rc_input * 3.0f;
+
+    if (pid_pos_yaw.ref_ > motor.max_) pid_pos_yaw.ref_ = motor.max_;
+    if (pid_pos_yaw.ref_ < motor.min_) pid_pos_yaw.ref_ = motor.min_;
+
+    float err_ = pid_pos_yaw.ref_ - pid_pos_yaw.fdb_;
+    if (err_ > 180) pid_pos_yaw.fdb_ += 360;
+    else if (err_ < -180) pid_pos_yaw.fdb_ -= 360;
+
+    float target_speed = pid_pos_yaw.calc(pid_pos_yaw.ref_, pid_pos_yaw.fdb_);
+
+    pid_spd_yaw.ref_ = target_speed;
+    pid_spd_yaw.fdb_ = motor.rotate_speed_;
+
+    return uint16_t(pid_spd_yaw.calc(pid_spd_yaw.ref_, pid_spd_yaw.fdb_));
 }
 
 
