@@ -4,7 +4,7 @@
 
 #include "motor_pid.h"
 
-
+float dt = 0.001f;
 
 PID::PID(float kp, float ki, float kd, float i_max, float out_max) {
     kp_ = kp;
@@ -25,8 +25,8 @@ float PID::calc(float ref, float fdb) {
     }
 
     pout_ = kp_ * err_;
-    iout_ = ki_ * err_sum_;
-    dout_ = kd_ * (last_err_ - err_);
+    iout_ = ki_ * err_sum_ * dt;
+    dout_ = kd_ * (last_err_ - err_) / dt;
 
     output_ = pout_ + iout_+ dout_ ;
     if (output_ > out_max_) {
@@ -39,5 +39,5 @@ float PID::calc(float ref, float fdb) {
 }
 
 
-PID pid_spd(10, 0, 0, 3000, 5000);
-PID pid_pos(10, 0, 0, 3000, 5000);
+PID pid_spd(1, 0, 0, 3000, 5000);
+PID pid_pos(1, 0, 0, 3000, 5000);
