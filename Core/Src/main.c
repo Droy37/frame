@@ -59,7 +59,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+float accel[3];
+float gyro[3];
 
+uint8_t i = 0;
+uint8_t rx_data[8];
+uint8_t tx_data;
+uint8_t range;
+uint8_t return_data;
 /* USER CODE END 0 */
 
 /**
@@ -97,7 +104,13 @@ int main(void)
   MX_TIM1_Init();
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
+  BMI088_Init();
 
+  BMI088_ReadReg_GYRO(0x00, &return_data, 1);
+  BMI088_WriteReg(0x41, 0x02);
+
+  BMI088_ReadReg_ACCEL(0x41, &return_data, 1);
+  range = return_data;
   /* USER CODE END 2 */
 
   /* Infinite loop */

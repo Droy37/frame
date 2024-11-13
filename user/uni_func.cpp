@@ -40,8 +40,6 @@ void dataProcess(const uint8_t pData[18]) {
     RC_CtrlData.mouse_.press_l = (MouseState_e)pData[12];
     RC_CtrlData.mouse_.press_r = (MouseState_e)pData[13];
     RC_CtrlData.key_.v = ((int16_t)pData[14]);// | ((int16_t)pData[15] << 8);
-
-
 }
 
 
@@ -52,14 +50,15 @@ void MainLoop(){
     dataProcess(rc_data);
 
     if (RC_CtrlData.switch_.s2 != down){
-        output = updateMotorPitch(RC_CtrlData.channel_.l_col, motor_pitch);
-        tx_data[0] = uint8_t(output >> 8);
-        tx_data[1] = uint8_t(output & 0xFF);
+        motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
+        updateMotorPitch(RC_CtrlData.channel_.l_col);
+        tx_data[0] = uint8_t(motor_pitch.control_data.output_ >> 8);
+        tx_data[1] = uint8_t(motor_pitch.control_data.output_ & 0xFF);
         TxHeader.StdId = 0x1FF;
         TxHeader.ExtId = 0;
         HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
 
-        output = updateMotorYaw(RC_CtrlData.channel_.l_row, motor_yaw);
+        output = updateMotorYaw(RC_CtrlData.channel_.l_row);
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
         TxHeader.StdId = 0x1FF;

@@ -18,7 +18,6 @@ void Motor::canRxMsgCallback(uint8_t* rx_data){
     uint8_t temp_mid = rx_data[6];
     temp_ = float(temp_mid);
 
-
     delta_ecd_angle_ = ecd_angle_ - last_ecd_angle_;
     if (delta_ecd_angle_ < 0) {
         delta_ecd_angle_ += 360;
@@ -30,42 +29,39 @@ void Motor::canRxMsgCallback(uint8_t* rx_data){
     angle_ += delta_angle_;
 }
 
-float pitch_ff_ = 20.0f;
-uint16_t updateMotorPitch(float rc_input, Motor motor) {
-    pid_pos_pitch.ref_ = pid_pos_pitch.fdb_ + rc_input * 3.0f;
+void updateMotorPitch(float target) {
+    //motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ + rc_input * 3.0f;
+    motor_pitch.control_data.target_ = target;
 
-    if (pid_pos_pitch.ref_ > motor.max_) pid_pos_pitch.ref_ = motor.max_;
-    if (pid_pos_pitch.ref_ < motor.min_) pid_pos_pitch.ref_ = motor.min_;
+    if (motor_pitch.control_data.target_ > motor_pitch.max_) motor_pitch.control_data.target_ = motor_pitch.max_;
+    if (motor_pitch.control_data.target_ < motor_pitch.min_) motor_pitch.control_data.target_ = motor_pitch.min_;
 
-    float err_ = pid_pos_pitch.ref_ - pid_pos_pitch.fdb_;
-    if (err_ > 180) pid_pos_pitch.fdb_ += 360;
-    else if (err_ < -180) pid_pos_pitch.fdb_ -= 360;
+    float err_ = motor_pitch.control_data.target_ - motor_pitch.control_data.fdb_;
+    if (err_ > 180) motor_pitch.control_data.fdb_ += 360;
+    else if (err_ < -180) motor_pitch.control_data.fdb_ -= 360;
 
-    float target_speed = pid_pos_pitch.calc(pid_pos_pitch.ref_, pid_pos_pitch.fdb_);
+    float target_speed = pid_pos_pitch.calc(motor_pitch.control_data.target_, motor_pitch.control_data.fdb_);
 
-    pid_spd_pitch.ref_ = target_speed;
-    pid_spd_pitch.fdb_ = motor.rotate_speed_;
-
-    return uint16_t(pid_spd_pitch.calc(pid_spd_pitch.ref_, pid_spd_pitch.fdb_) + pitch_ff_);
+    motor_pitch.control_data.output_ = pid_spd_pitch.calc(target_speed, motor_pitch.rotate_speed_) + motor_pitch.control_data.ff_;
 }
 
-uint16_t updateMotorYaw(float rc_input, Motor motor) {
-    pid_pos_yaw.ref_ = pid_pos_yaw.fdb_ + rc_input * 3.0f;
-
-    if (pid_pos_yaw.ref_ > motor.max_) pid_pos_yaw.ref_ = motor.max_;
-    if (pid_pos_yaw.ref_ < motor.min_) pid_pos_yaw.ref_ = motor.min_;
-
-    float err_ = pid_pos_yaw.ref_ - pid_pos_yaw.fdb_;
-    if (err_ > 180) pid_pos_yaw.fdb_ += 360;
-    else if (err_ < -180) pid_pos_yaw.fdb_ -= 360;
-
-    float target_speed = pid_pos_yaw.calc(pid_pos_yaw.ref_, pid_pos_yaw.fdb_);
-
-    pid_spd_yaw.ref_ = target_speed;
-    pid_spd_yaw.fdb_ = motor.rotate_speed_;
-
-    return uint16_t(pid_spd_yaw.calc(pid_spd_yaw.ref_, pid_spd_yaw.fdb_));
-}
+// uint16_t updateMotorYaw(float target) {
+//     //pid_pos_yaw.ref_ = pid_pos_yaw.fdb_ + rc_input * 3.0f;
+//
+//     if (pid_pos_yaw.ref_ > motor_yaw.max_) pid_pos_yaw.ref_ = motor_yaw.max_;
+//     if (pid_pos_yaw.ref_ < motor_yaw.min_) pid_pos_yaw.ref_ = motor_yaw.min_;
+//
+//     float err_ = pid_pos_yaw.ref_ - pid_pos_yaw.fdb_;
+//     if (err_ > 180) pid_pos_yaw.fdb_ += 360;
+//     else if (err_ < -180) pid_pos_yaw.fdb_ -= 360;
+//
+//     float target_speed = pid_pos_yaw.calc(pid_pos_yaw.ref_, pid_pos_yaw.fdb_);
+//
+//     pid_spd_yaw.ref_ = target_speed;
+//     pid_spd_yaw.fdb_ = motor_yaw.rotate_speed_;
+//
+//     return uint16_t(pid_spd_yaw.calc(pid_spd_yaw.ref_, pid_spd_yaw.fdb_));
+// }
 
 
 M2006 motor_pitch;

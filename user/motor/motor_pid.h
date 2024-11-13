@@ -14,7 +14,6 @@ public:
     float kp_,ki_, kd_;
     float i_max_,out_max_;
     float output_;
-    float ref_, fdb_;
     float err_,err_sum_, last_err_;
     float pout_, iout_, dout_;
 };

@@ -27,6 +27,13 @@ public:
     float max_;
     float min_;
 
+    struct {
+        float fdb_;
+        float target_;
+        float ff_;
+        float output_;
+    } control_data;
+
     void canRxMsgCallback(uint8_t rx_data[8]);
 
 };
@@ -45,7 +52,7 @@ public:
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
-        max_ = 180;
+        max_ = 100;
         min_ = 0;
     }
 };
@@ -55,7 +62,7 @@ class M2006 : public Motor
 public:
     M2006() : Motor()
     {
-        ratio_ = -36;
+        ratio_ = 36;
         angle_ = 0;
         delta_angle_ = 0;
         ecd_angle_ = 0;
@@ -64,7 +71,7 @@ public:
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
-        max_ = 180;
+        max_ = 100;
         min_ = 0;
     }
     uint16_t updateMotor(float rc_input, Motor motor);
@@ -84,13 +91,13 @@ public:
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
-        max_ = 180;
+        max_ = 100;
         min_ = 0;
     }
 };
 
-uint16_t updateMotorPitch(float rc_input, Motor motor);
-uint16_t updateMotorYaw(float rc_input, Motor motor);
+void updateMotorPitch(float target);
+void updateMotorYaw(float target);
 
 extern M2006 motor_pitch;
 extern M3508 motor_yaw;
