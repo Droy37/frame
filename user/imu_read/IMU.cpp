@@ -7,7 +7,6 @@ extern "C" {
 #endif
 
 #include <math.h>
-#include "imu.h"
 #include "spi.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
@@ -16,8 +15,8 @@ extern float accel[3];
 extern float gyro[3];
 
 extern uint8_t i;
-extern uint8_t rx_data[8];
-extern uint8_t tx_data;
+extern uint8_t imu_rx_data[8];
+extern uint8_t imu_tx_data;
 extern uint8_t range;
 
 void BMI088_ACCEL_NS_L() {
@@ -35,8 +34,8 @@ void BMI088_GYRO_NS_H() {
 
 void BMI088_ReadReg_ACCEL(uint8_t reg, uint8_t *return_data, uint8_t length) {
     BMI088_ACCEL_NS_L();
-    tx_data = (reg | 0x80);
-    HAL_SPI_Transmit(&hspi1, &tx_data, 1, 1000);
+    imu_tx_data = (reg | 0x80);
+    HAL_SPI_Transmit(&hspi1, &imu_tx_data, 1, 1000);
     while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_TX);
     HAL_SPI_Receive(&hspi1, return_data, 1, 1000);
     while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_RX);
@@ -45,19 +44,19 @@ void BMI088_ReadReg_ACCEL(uint8_t reg, uint8_t *return_data, uint8_t length) {
     while (i < length) {
         HAL_SPI_Receive(&hspi1, return_data, 1, 1000);
         while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_RX);
-        rx_data[i] = *return_data;
+        imu_rx_data[i] = *return_data;
         i++;
     }
     BMI088_ACCEL_NS_H();
-    accel[0] = (int16_t)((rx_data[1] << 8) | rx_data[0]) *1000*pow(2,(range+1))*1.5/32768;
-    accel[1] = (int16_t)((rx_data[3] << 8) | rx_data[2]) *1000*pow(2,(range+1))*1.5/32768;
-    accel[2] = (int16_t)((rx_data[5] << 8) | rx_data[4]) *1000*pow(2,(range+1))*1.5/32768;
+    accel[0] = (int16_t)((imu_rx_data[1] << 8) | imu_rx_data[0]) *1000*pow(2,(range+1))*1.5/32768;
+    accel[1] = (int16_t)((imu_rx_data[3] << 8) | imu_rx_data[2]) *1000*pow(2,(range+1))*1.5/32768;
+    accel[2] = (int16_t)((imu_rx_data[5] << 8) | imu_rx_data[4]) *1000*pow(2,(range+1))*1.5/32768;
 }
 
 void BMI088_ReadReg_GYRO(uint8_t reg, uint8_t *return_data, uint8_t length) {
     BMI088_GYRO_NS_L();
-    tx_data = (reg | 0x80);
-    HAL_SPI_Transmit(&hspi1, &tx_data, 1, 1000);
+    imu_tx_data = (reg | 0x80);
+    HAL_SPI_Transmit(&hspi1, &imu_tx_data, 1, 1000);
     while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_TX);
 
     i = 0;
@@ -65,24 +64,24 @@ void BMI088_ReadReg_GYRO(uint8_t reg, uint8_t *return_data, uint8_t length) {
     {
         HAL_SPI_Receive(&hspi1, return_data, 1, 1000);
         while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_RX);
-        rx_data[i] = *return_data;
+        imu_rx_data[i] = *return_data;
         i++;
     }
     BMI088_GYRO_NS_H();
 
-    gyro[0] = ((int16_t)((rx_data[3]) << 8) | rx_data[2])*2000/32767 ;
-    gyro[1] = ((int16_t)((rx_data[5]) << 8) | rx_data[4])*2000/32767 ;
-    gyro[2] = ((int16_t)((rx_data[7]) << 8) | rx_data[6])*2000/32767 ;
+    gyro[0] = ((int16_t)((imu_rx_data[3]) << 8) | imu_rx_data[2])*2000/32767 ;
+    gyro[1] = ((int16_t)((imu_rx_data[5]) << 8) | imu_rx_data[4])*2000/32767 ;
+    gyro[2] = ((int16_t)((imu_rx_data[7]) << 8) | imu_rx_data[6])*2000/32767 ;
 }
 
 void BMI088_WriteReg(uint8_t reg, uint8_t write_data) {
     BMI088_ACCEL_NS_L();
-    tx_data = (reg & 0x7F);
-    HAL_SPI_Transmit(&hspi1, &tx_data, 1, 1000);
+    imu_tx_data = (reg & 0x7F);
+    HAL_SPI_Transmit(&hspi1, &imu_tx_data, 1, 1000);
     while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_TX);
 
-    tx_data = write_data;
-    HAL_SPI_Transmit(&hspi1, &tx_data, 1, 1000);
+    imu_tx_data = write_data;
+    HAL_SPI_Transmit(&hspi1, &imu_tx_data, 1, 1000);
     while(HAL_SPI_GetState(&hspi1)==HAL_SPI_STATE_BUSY_TX);
 
     HAL_Delay(1);

@@ -5,6 +5,7 @@
 #include "motor_def.h"
 #include "motor_pid.h"
 #include "../uni_func.h"
+#include "../Inc/main.h"
 
 void Motor::canRxMsgCallback(uint8_t* rx_data){
     uint16_t ecd_angle_mid = (rx_data[0] << 8) | rx_data[1];

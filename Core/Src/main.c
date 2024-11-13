@@ -21,6 +21,7 @@
 #include "can.h"
 #include "dma.h"
 #include "iwdg.h"
+#include "../../user/imu_read/IMU.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -63,8 +64,8 @@ float accel[3];
 float gyro[3];
 
 uint8_t i = 0;
-uint8_t rx_data[8];
-uint8_t tx_data;
+uint8_t imu_rx_data[8];
+uint8_t imu_tx_data;
 uint8_t range;
 uint8_t return_data;
 /* USER CODE END 0 */
@@ -103,6 +104,7 @@ int main(void)
   MX_CAN1_Init();
   MX_TIM1_Init();
   MX_IWDG_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   BMI088_Init();
 
