@@ -30,6 +30,9 @@ void Motor::canRxMsgCallback(uint8_t* rx_data){
     angle_ += delta_angle_;
 }
 
+extern float accel[3];
+extern float gyro[3];
+
 void updateMotorPitch(float target) {
     //motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ + rc_input * 3.0f;
     motor_pitch.control_data.target_ = target;

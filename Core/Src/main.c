@@ -21,10 +21,11 @@
 #include "can.h"
 #include "dma.h"
 #include "iwdg.h"
-#include "../../user/imu_read/IMU.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "../../user/imu_read/IMU.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -119,6 +120,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    BMI088_ReadReg_ACCEL(0x12, &return_data, 6);
+    BMI088_ReadReg_GYRO(0x00, &return_data, 8);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
