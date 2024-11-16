@@ -5,7 +5,7 @@
 
 #ifndef MOTOR_DEF_H
 #define MOTOR_DEF_H
-#include <cstdint>
+#include <stdint.h>
 
 
 class Motor {
@@ -91,16 +91,16 @@ public:
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
-        max_ = 100;
-        min_ = 0;
+        max_ = 190;
+        min_ = 130;
     }
 };
 
 void updateMotorPitch(float target);
 void updateMotorYaw(float target);
 
-extern M2006 motor_pitch;
-extern M3508 motor_yaw;
+extern M6020 motor_pitch;
+extern M6020 motor_yaw;
 extern uint8_t rx_data[8];
 extern uint8_t tx_data[8];
 #endif //MOTOR_DEF_H

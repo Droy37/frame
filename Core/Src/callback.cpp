@@ -1,15 +1,18 @@
 //
-// Created by CLC on 2024/11/11.
+// Created by CLC on 2024/11/15.
 //
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "can.h"
 #include "tim.h"
 #include "usart.h"
-#include "remotecontrol/rc_def.h"
-#include "motor/motor_def.h"
-#include "uni_func.h"
+#include "../../user/remotecontrol/rc_def.h"
+#include "../../user/motor/motor_def.h"
+#include "../../user/uni_func.h"
 
-CAN_FilterTypeDef FilterConfig = {0, 0, 0, 0, CAN_FILTER_FIFO0, 14, CAN_FILTERMODE_IDMASK, CAN_FILTERSCALE_32BIT, ENABLE};
 CAN_RxHeaderTypeDef RxHeader;
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
@@ -32,3 +35,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         MainLoop();
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
+

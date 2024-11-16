@@ -17,4 +17,7 @@ void BMI088_WriteReg(uint8_t reg, uint8_t write_data);
 
 void BMI088_Init();
 
+void calculateAngle();
+extern float pitch;
+
 #endif //IMU_H

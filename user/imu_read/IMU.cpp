@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include <math.h>
+#include "math.h"
 #include "spi.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
@@ -48,9 +48,9 @@ void BMI088_ReadReg_ACCEL(uint8_t reg, uint8_t *return_data, uint8_t length) {
         i++;
     }
     BMI088_ACCEL_NS_H();
-    accel[0] = (int16_t)((imu_rx_data[1] << 8) | imu_rx_data[0]) *1000*pow(2,(range+1))*1.5/32768;
-    accel[1] = (int16_t)((imu_rx_data[3] << 8) | imu_rx_data[2]) *1000*pow(2,(range+1))*1.5/32768;
-    accel[2] = (int16_t)((imu_rx_data[5] << 8) | imu_rx_data[4]) *1000*pow(2,(range+1))*1.5/32768;
+    accel[0] = (int16_t)((imu_rx_data[1] << 8) | imu_rx_data[0]) *10*pow(2,(range+1))*1.5/32768;
+    accel[1] = (int16_t)((imu_rx_data[3] << 8) | imu_rx_data[2]) *10*pow(2,(range+1))*1.5/32768;
+    accel[2] = (int16_t)((imu_rx_data[5] << 8) | imu_rx_data[4]) *10*pow(2,(range+1))*1.5/32768;
 }
 
 void BMI088_ReadReg_GYRO(uint8_t reg, uint8_t *return_data, uint8_t length) {
@@ -108,6 +108,18 @@ void BMI088_Init() {
     HAL_Delay(1);
     BMI088_ACCEL_NS_H();
 }
+
+float pitch = 0.0;
+float alpha = 0.9;
+float imu_dt = 0.001;
+float pi = 3.14159265358979323846;
+//void calculateAngle()
+//{
+//    float pitch_gyro = gyro[1] * imu_dt;
+//    float pitch_acc = atan2(accel[0], sqrt(accel[1] * accel[1] + accel[2] * accel[2])) * 180 / pi;
+    //pitch = alpha * (pitch + pitch_gyro) + (1 - alpha) * pitch_acc;
+//    pitch = pitch + pitch_gyro;
+//}
 
 #ifdef __cplusplus
 }

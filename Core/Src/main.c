@@ -25,10 +25,10 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "../../user/imu_read/IMU.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "../../user/imu_read/IMU.h"
 
 /* USER CODE END Includes */
 
@@ -69,6 +69,8 @@ uint8_t imu_rx_data[8];
 uint8_t imu_tx_data;
 uint8_t range;
 uint8_t return_data;
+CAN_FilterTypeDef FilterConfig = {0, 0, 0, 0, CAN_FILTER_FIFO0, 14, CAN_FILTERMODE_IDMASK, CAN_FILTERSCALE_32BIT, ENABLE};
+
 /* USER CODE END 0 */
 
 /**
@@ -104,9 +106,15 @@ int main(void)
   MX_USART3_UART_Init();
   MX_CAN1_Init();
   MX_TIM1_Init();
-  MX_IWDG_Init();
+//  MX_IWDG_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim1);
+
+  HAL_CAN_ConfigFilter(&hcan1, &FilterConfig);
+  HAL_CAN_Start(&hcan1);
+  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+
   BMI088_Init();
 
   BMI088_ReadReg_GYRO(0x00, &return_data, 1);
@@ -120,8 +128,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    BMI088_ReadReg_ACCEL(0x12, &return_data, 6);
-    BMI088_ReadReg_GYRO(0x00, &return_data, 8);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
