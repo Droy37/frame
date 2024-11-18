@@ -29,37 +29,26 @@ void MainLoop(){
     BMI088_ReadReg_ACCEL(0x12, &return_data, 6);
     BMI088_ReadReg_GYRO(0x00, &return_data, 8);
 
-    //if (RC_CtrlData.switch_.s2 != down){
-    motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
-    feedback = motor_pitch.ecd_angle_;
-    updateMotorPitch(target);
-    output = uint16_t(motor_pitch.control_data.output_);
+    if (RC_CtrlData.switch_.s2 != down){
+        motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
+        feedback = motor_pitch.ecd_angle_;
+        updateMotorPitch(RC_CtrlData.channel_.l_col);
+        output = uint16_t(motor_pitch.control_data.output_);
 
-    tx_data[0] = uint8_t(output >> 8);
-    tx_data[1] = uint8_t(output & 0xFF);
-    tx_data[2] = uint8_t(output >> 8);
-    tx_data[3] = uint8_t(output & 0xFF);
-    tx_data[4] = uint8_t(output >> 8);
-    tx_data[5] = uint8_t(output & 0xFF);
-    tx_data[6] = uint8_t(output >> 8);
-    tx_data[7] = uint8_t(output & 0xFF);
-    TxHeader.StdId = 0x1FF;
+        tx_data[0] = uint8_t(output >> 8);
+        tx_data[1] = uint8_t(output & 0xFF);
+        tx_data[2] = uint8_t(output >> 8);
+        tx_data[3] = uint8_t(output & 0xFF);
+        tx_data[4] = uint8_t(output >> 8);
+        tx_data[5] = uint8_t(output & 0xFF);
+        tx_data[6] = uint8_t(output >> 8);
+        tx_data[7] = uint8_t(output & 0xFF);
+        TxHeader.StdId = 0x1FF;
 
-    while(HAL_CAN_IsTxMessagePending(&hcan1, TxMailbox))
-    {
-        HAL_CAN_StateTypeDef b=HAL_CAN_GetState(&hcan1);
+        while(HAL_CAN_IsTxMessagePending(&hcan1, TxMailbox)){}
+        if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox)!=HAL_OK){}
+
     }
-    if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox)!=HAL_OK){};
-    // TxHeader.StdId = 0x2FF;
-    // HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
-
-        // output = updateMotorYaw(RC_CtrlData.channel_.l_row);
-        // tx_data[0] = uint8_t(output >> 8);
-        // tx_data[1] = uint8_t(output & 0xFF);
-        // TxHeader.StdId = 0x1FF;
-        // TxHeader.ExtId = 0;
-        // HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox);
-    //}
 }
 
 

@@ -40,9 +40,9 @@ extern float gyro[3];
 extern float pi;
 uint16_t k_ff = 0x270;
 
-void updateMotorPitch(float target) {
-    //motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ + rc_input * 3.0f;
-    motor_pitch.control_data.target_ = target;
+void updateMotorPitch(float input) {
+    motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ - input * 3.0f;
+    //motor_pitch.control_data.target_ = input;
     motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
 
     if (motor_pitch.control_data.target_ > motor_pitch.max_) motor_pitch.control_data.target_ = motor_pitch.max_;
@@ -59,23 +59,6 @@ void updateMotorPitch(float target) {
     motor_pitch.control_data.output_ = pid_spd_pitch.calc(target_speed, motor_pitch.rotate_speed_) + motor_pitch.control_data.ff_;
 }
 
-// uint16_t updateMotorYaw(float target) {
-//     //pid_pos_yaw.ref_ = pid_pos_yaw.fdb_ + rc_input * 3.0f;
-//
-//     if (pid_pos_yaw.ref_ > motor_yaw.max_) pid_pos_yaw.ref_ = motor_yaw.max_;
-//     if (pid_pos_yaw.ref_ < motor_yaw.min_) pid_pos_yaw.ref_ = motor_yaw.min_;
-//
-//     float err_ = pid_pos_yaw.ref_ - pid_pos_yaw.fdb_;
-//     if (err_ > 180) pid_pos_yaw.fdb_ += 360;
-//     else if (err_ < -180) pid_pos_yaw.fdb_ -= 360;
-//
-//     float target_speed = pid_pos_yaw.calc(pid_pos_yaw.ref_, pid_pos_yaw.fdb_);
-//
-//     pid_spd_yaw.ref_ = target_speed;
-//     pid_spd_yaw.fdb_ = motor_yaw.rotate_speed_;
-//
-//     return uint16_t(pid_spd_yaw.calc(pid_spd_yaw.ref_, pid_spd_yaw.fdb_));
-// }
 
 
 M6020 motor_pitch;

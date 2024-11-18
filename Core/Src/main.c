@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "../../user/imu_read/IMU.h"
+#include "../../user/remotecontrol/rc_def.h"
 
 /* USER CODE END Includes */
 
@@ -116,12 +117,12 @@ int main(void)
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
   BMI088_Init();
-
   BMI088_ReadReg_GYRO(0x00, &return_data, 1);
   BMI088_WriteReg(0x41, 0x02);
-
   BMI088_ReadReg_ACCEL(0x41, &return_data, 1);
   range = return_data;
+
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, buffer, sizeof(buffer));
   /* USER CODE END 2 */
 
   /* Infinite loop */
