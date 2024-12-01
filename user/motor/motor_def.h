@@ -91,8 +91,6 @@ public:
         rotate_speed_ = 0;
         current_ = 0;
         temp_ = 25;
-        max_ = 185;
-        min_ = 145;
     }
 };
 

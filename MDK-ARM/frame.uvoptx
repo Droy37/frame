@@ -203,37 +203,42 @@
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>output</ItemText>
+          <ItemText>pid_spd_pitch</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pid_spd_pitch</ItemText>
+          <ItemText>pid_pos_pitch</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pid_pos_pitch</ItemText>
+          <ItemText>rc_data</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>target</ItemText>
+          <ItemText>pid_spd_yaw</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>\\frame\../user/motor/motor_pid.cpp\pid_pos_pitch.kp_</ItemText>
+          <ItemText>pid_pos_yaw</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>\\frame\../user/uni_func.cpp\target</ItemText>
+          <ItemText>motor_yaw</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rc_data</ItemText>
+          <ItemText>target_pitch</ItemText>
+        </Ww>
+        <Ww>
+          <count>17</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>target_yaw</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

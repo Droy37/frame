@@ -21,8 +21,8 @@ uint32_t TxMailbox = CAN_TX_MAILBOX0;
 
 uint16_t output;
 extern uint8_t return_data;
-float target = 168;
-float feedback;
+float target_pitch = 230, target_yaw = 70;
+float fdb_pitch, fdb_yaw;
 void MainLoop(){
 //    HAL_IWDG_Refresh(&hiwdg);
     dataProcess(rc_data);
@@ -31,19 +31,20 @@ void MainLoop(){
 
     if (RC_CtrlData.switch_.s2 != down){
         motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
-        feedback = motor_pitch.ecd_angle_;
+        fdb_pitch = motor_pitch.ecd_angle_;
         updateMotorPitch(RC_CtrlData.channel_.l_col);
+        //updateMotorPitch(target_pitch);
         output = uint16_t(motor_pitch.control_data.output_);
-
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
-        tx_data[2] = uint8_t(output >> 8);
-        tx_data[3] = uint8_t(output & 0xFF);
+
+        motor_yaw.control_data.fdb_ = motor_yaw.ecd_angle_;
+        fdb_yaw = motor_yaw.ecd_angle_;
+        updateMotorYaw(RC_CtrlData.channel_.l_row);
+        //updateMotorYaw(target_yaw);
+        output = uint16_t(motor_yaw.control_data.output_);
         tx_data[4] = uint8_t(output >> 8);
         tx_data[5] = uint8_t(output & 0xFF);
-        tx_data[6] = uint8_t(output >> 8);
-        tx_data[7] = uint8_t(output & 0xFF);
-        TxHeader.StdId = 0x1FF;
 
         while(HAL_CAN_IsTxMessagePending(&hcan1, TxMailbox)){}
         if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox)!=HAL_OK){}
