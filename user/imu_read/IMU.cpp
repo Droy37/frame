@@ -2,10 +2,12 @@
 // Created by CLC on 2024/11/13.
 //
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "IMU.h"
 #include "math.h"
 #include "spi.h"
 #include "main.h"
@@ -69,9 +71,9 @@ void BMI088_ReadReg_GYRO(uint8_t reg, uint8_t *return_data, uint8_t length) {
     }
     BMI088_GYRO_NS_H();
 
-    gyro[0] = ((int16_t)((imu_rx_data[3]) << 8) | imu_rx_data[2])*2000/32767 ;
-    gyro[1] = ((int16_t)((imu_rx_data[5]) << 8) | imu_rx_data[4])*2000/32767 ;
-    gyro[2] = ((int16_t)((imu_rx_data[7]) << 8) | imu_rx_data[6])*2000/32767 ;
+    gyro[0] = (float)((int16_t)((imu_rx_data[3]) << 8) | imu_rx_data[2])*2000/32767 ;
+    gyro[1] = (float)((int16_t)((imu_rx_data[5]) << 8) | imu_rx_data[4])*2000/32767 ;
+    gyro[2] = (float)((int16_t)((imu_rx_data[7]) << 8) | imu_rx_data[6])*2000/32767 ;
 }
 
 void BMI088_WriteReg(uint8_t reg, uint8_t write_data) {
@@ -109,17 +111,22 @@ void BMI088_Init() {
     BMI088_ACCEL_NS_H();
 }
 
-float pitch = 0.0;
-float alpha = 0.9;
+IMU imu;
+
+float k = 0.4;
 float imu_dt = 0.001;
-float pi = 3.14159265358979323846;
-//void calculateAngle()
-//{
-//    float pitch_gyro = gyro[1] * imu_dt;
-//    float pitch_acc = atan2(accel[0], sqrt(accel[1] * accel[1] + accel[2] * accel[2])) * 180 / pi;
-    //pitch = alpha * (pitch + pitch_gyro) + (1 - alpha) * pitch_acc;
-//    pitch = pitch + pitch_gyro;
-//}
+void IMU_calc()
+{
+    imu.r_acc = atan(double(accel[1]/accel[2]));
+    imu.p_acc = -atan(double(accel[0] / pow(accel[1]*accel[1] + accel[2]*accel[2], 0.5)));
+    imu.r_gyro = imu.roll + gyro[0]*imu_dt;
+    imu.p_gyro = imu.pitch + gyro[1]*imu_dt;
+    imu.y_gyro = imu.yaw + gyro[2]*imu_dt;
+    imu.roll = imu.roll + (imu.r_acc - imu.r_gyro) * k;
+    imu.pitch = imu.pitch + (imu.p_acc - imu.p_gyro) * k;
+    imu.yaw = imu.y_gyro;
+}
+
 
 #ifdef __cplusplus
 }

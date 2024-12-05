@@ -2,11 +2,12 @@
 // Created by CLC on 2024/11/11.
 //
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
+#define M_PI 3.14159265358979323846
 #include "uni_func.h"
 #include "can.h"
 #include "iwdg.h"
@@ -21,27 +22,37 @@ uint32_t TxMailbox = CAN_TX_MAILBOX0;
 
 uint16_t output;
 extern uint8_t return_data;
-float target_pitch = 230, target_yaw = 70;
+float target_pitch = 200, target_yaw = 70;
+float angle_pitch, angle_yaw;
 float fdb_pitch, fdb_yaw;
+//uint32_t MainCnt = 0;
+
 void MainLoop(){
 //    HAL_IWDG_Refresh(&hiwdg);
+//    MainCnt++;
+
     dataProcess(rc_data);
     BMI088_ReadReg_ACCEL(0x12, &return_data, 6);
     BMI088_ReadReg_GYRO(0x00, &return_data, 8);
 
-    if (RC_CtrlData.switch_.s2 != down){
+    IMU_calc();
+    //if (RC_CtrlData.switch_.s2 != down){
         motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
-        fdb_pitch = motor_pitch.ecd_angle_;
-        updateMotorPitch(RC_CtrlData.channel_.l_col);
-        //updateMotorPitch(target_pitch);
+        angle_pitch = motor_pitch.ecd_angle_;
+        // motor_pitch.control_data.fdb_ = imu.pitch * 180 / M_PI + 230;
+        // angle_pitch = imu.pitch * 180 / M_PI;
+        //updateMotorPitch(RC_CtrlData.channel_.l_col);
+        updateMotorPitch(target_pitch);
         output = uint16_t(motor_pitch.control_data.output_);
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
 
         motor_yaw.control_data.fdb_ = motor_yaw.ecd_angle_;
-        fdb_yaw = motor_yaw.ecd_angle_;
-        updateMotorYaw(RC_CtrlData.channel_.l_row);
-        //updateMotorYaw(target_yaw);
+        angle_yaw = motor_yaw.ecd_angle_;
+        // motor_yaw.control_data.fdb_ = imu.yaw * 180 / M_PI;
+        // angle_yaw = imu.yaw * 180 / M_PI;
+        //updateMotorYaw(RC_CtrlData.channel_.l_row);
+        updateMotorYaw(target_yaw);
         output = uint16_t(motor_yaw.control_data.output_);
         tx_data[4] = uint8_t(output >> 8);
         tx_data[5] = uint8_t(output & 0xFF);
@@ -49,7 +60,7 @@ void MainLoop(){
         while(HAL_CAN_IsTxMessagePending(&hcan1, TxMailbox)){}
         if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, tx_data, &TxMailbox)!=HAL_OK){}
 
-    }
+    //}
 }
 
 

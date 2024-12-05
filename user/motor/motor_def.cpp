@@ -38,11 +38,10 @@ void Motor::canRxMsgCallback(uint8_t* rx_data){
 extern float accel[3];
 extern float gyro[3];
 extern float pi;
-int16_t k_ff = 0xFC18;
 
 void updateMotorPitch(float input) {
-    motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ - input * 5.0f;
-    //motor_pitch.control_data.target_ = input;
+    //motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ - input * 5.0f;
+    motor_pitch.control_data.target_ = input;
     motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
 
     //if (motor_pitch.control_data.target_ > motor_pitch.max_) motor_pitch.control_data.target_ = motor_pitch.max_;
@@ -55,13 +54,13 @@ void updateMotorPitch(float input) {
     float target_speed = pid_pos_pitch.calc(motor_pitch.control_data.target_, motor_pitch.control_data.fdb_);
 
     //calculateAngle();
-    motor_pitch.control_data.ff_ = k_ff * sin((motor_pitch.ecd_angle_-225) * pi / 180);
+    motor_pitch.control_data.ff_ = -22.189 * motor_pitch.ecd_angle_ + 5000;
     motor_pitch.control_data.output_ = pid_spd_pitch.calc(target_speed, motor_pitch.rotate_speed_) + motor_pitch.control_data.ff_;
 }
 
 void updateMotorYaw(float input) {
-    motor_yaw.control_data.target_ = motor_yaw.control_data.fdb_ - input * 3.0f;
-    //motor_yaw.control_data.target_ = input;
+    //motor_yaw.control_data.target_ = motor_yaw.control_data.fdb_ - input * 3.0f;
+    motor_yaw.control_data.target_ = input;
     motor_yaw.control_data.fdb_ = motor_yaw.ecd_angle_;
 
     //if (motor_yaw.control_data.target_ > motor_yaw.max_) motor_yaw.control_data.target_ = motor_yaw.max_;
