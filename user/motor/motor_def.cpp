@@ -42,7 +42,7 @@ extern float pi;
 void updateMotorPitch(float input) {
     //motor_pitch.control_data.target_ = motor_pitch.control_data.fdb_ - input * 5.0f;
     motor_pitch.control_data.target_ = input;
-    motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
+    motor_pitch.control_data.fdb_ = imu.pitch;
 
     //if (motor_pitch.control_data.target_ > motor_pitch.max_) motor_pitch.control_data.target_ = motor_pitch.max_;
     //if (motor_pitch.control_data.target_ < motor_pitch.min_) motor_pitch.control_data.target_ = motor_pitch.min_;
@@ -54,14 +54,14 @@ void updateMotorPitch(float input) {
     float target_speed = pid_pos_pitch.calc(motor_pitch.control_data.target_, motor_pitch.control_data.fdb_);
 
     //calculateAngle();
-    motor_pitch.control_data.ff_ = -22.189 * motor_pitch.ecd_angle_ + 5000;
+    motor_pitch.control_data.ff_ = -22.189 * (imu.pitch+225) + 5000;
     motor_pitch.control_data.output_ = pid_spd_pitch.calc(target_speed, motor_pitch.rotate_speed_) + motor_pitch.control_data.ff_;
 }
 
 void updateMotorYaw(float input) {
     //motor_yaw.control_data.target_ = motor_yaw.control_data.fdb_ - input * 3.0f;
     motor_yaw.control_data.target_ = input;
-    motor_yaw.control_data.fdb_ = motor_yaw.ecd_angle_;
+    motor_yaw.control_data.fdb_ = imu.yaw;
 
     //if (motor_yaw.control_data.target_ > motor_yaw.max_) motor_yaw.control_data.target_ = motor_yaw.max_;
     //if (motor_yaw.control_data.target_ < motor_yaw.min_) motor_yaw.control_data.target_ = motor_yaw.min_;

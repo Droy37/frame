@@ -22,14 +22,14 @@ uint32_t TxMailbox = CAN_TX_MAILBOX0;
 
 uint16_t output;
 extern uint8_t return_data;
-float target_pitch = 200, target_yaw = 70;
+float target_pitch = 0, target_yaw = 0;
 float angle_pitch, angle_yaw;
 float fdb_pitch, fdb_yaw;
-//uint32_t MainCnt = 0;
+uint32_t mainCnt = 0;
 
 void MainLoop(){
 //    HAL_IWDG_Refresh(&hiwdg);
-//    MainCnt++;
+    mainCnt++;
 
     dataProcess(rc_data);
     BMI088_ReadReg_ACCEL(0x12, &return_data, 6);
@@ -37,20 +37,14 @@ void MainLoop(){
 
     IMU_calc();
     //if (RC_CtrlData.switch_.s2 != down){
-        motor_pitch.control_data.fdb_ = motor_pitch.ecd_angle_;
-        angle_pitch = motor_pitch.ecd_angle_;
-        // motor_pitch.control_data.fdb_ = imu.pitch * 180 / M_PI + 230;
-        // angle_pitch = imu.pitch * 180 / M_PI;
+        angle_pitch = imu.pitch;
         //updateMotorPitch(RC_CtrlData.channel_.l_col);
         updateMotorPitch(target_pitch);
         output = uint16_t(motor_pitch.control_data.output_);
         tx_data[0] = uint8_t(output >> 8);
         tx_data[1] = uint8_t(output & 0xFF);
 
-        motor_yaw.control_data.fdb_ = motor_yaw.ecd_angle_;
-        angle_yaw = motor_yaw.ecd_angle_;
-        // motor_yaw.control_data.fdb_ = imu.yaw * 180 / M_PI;
-        // angle_yaw = imu.yaw * 180 / M_PI;
+        angle_yaw = imu.yaw;
         //updateMotorYaw(RC_CtrlData.channel_.l_row);
         updateMotorYaw(target_yaw);
         output = uint16_t(motor_yaw.control_data.output_);

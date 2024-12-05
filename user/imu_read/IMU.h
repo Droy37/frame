@@ -10,9 +10,8 @@
 typedef struct
 {
     float roll, pitch, yaw;
-    float r_acc, r_gyro;
-    float p_acc, p_gyro;
-    float y_gyro;
+    float r_acc;
+    float p_acc;
 }IMU;
 
 void BMI088_ACCEL_NS_L();

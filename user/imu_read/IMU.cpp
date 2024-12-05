@@ -12,6 +12,7 @@ extern "C" {
 #include "spi.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
+#define M_PI 3.14159265358979323846
 
 extern float accel[3];
 extern float gyro[3];
@@ -113,18 +114,22 @@ void BMI088_Init() {
 
 IMU imu;
 
-float k = 0.4;
+float k = 0.0004;
 float imu_dt = 0.001;
 void IMU_calc()
 {
-    imu.r_acc = atan(double(accel[1]/accel[2]));
-    imu.p_acc = -atan(double(accel[0] / pow(accel[1]*accel[1] + accel[2]*accel[2], 0.5)));
-    imu.r_gyro = imu.roll + gyro[0]*imu_dt;
-    imu.p_gyro = imu.pitch + gyro[1]*imu_dt;
-    imu.y_gyro = imu.yaw + gyro[2]*imu_dt;
-    imu.roll = imu.roll + (imu.r_acc - imu.r_gyro) * k;
-    imu.pitch = imu.pitch + (imu.p_acc - imu.p_gyro) * k;
-    imu.yaw = imu.y_gyro;
+    imu.r_acc = atan2(accel[1], accel[2]) * 180.0 / M_PI;
+    imu.p_acc = -atan2(accel[0], sqrt(accel[1]*accel[1] + accel[2]*accel[2])) * 180.0 / M_PI;
+
+    float roll = imu.roll * M_PI / 180;
+    float pitch = imu.pitch * M_PI / 180;
+    float yaw_gyro = sin(roll) / cos(pitch) * gyro[1] + cos(roll) / cos(pitch) * gyro[2];
+    float roll_gyro = gyro[0] + sin(pitch) * sin(roll) / cos(pitch) * gyro[1] + cos(roll) * sin(pitch) / cos(pitch) * gyro[2];
+    float pitch_gyro = cos(roll) * gyro[1] - sin(roll) * gyro[2];
+
+    imu.yaw = imu.yaw + yaw_gyro * imu_dt;
+    imu.roll = (imu.roll + roll_gyro * imu_dt) * (1 - k) + imu.r_acc * k;
+    imu.pitch = (imu.pitch + pitch_gyro * imu_dt) * (1 - k) + imu.p_acc * k;
 }
 
 
